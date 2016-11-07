@@ -16,7 +16,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - ./gradlew
+  - ./gradlew clean build check
 
 cache:
   directories:
