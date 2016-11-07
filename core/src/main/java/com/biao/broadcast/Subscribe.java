@@ -28,4 +28,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Subscribe {
+
+  /**
+   * override that has the same identifier.
+   * see {@link DefaultRegistry.MethodIdentifier}
+   */
+  boolean override() default true;
 }
