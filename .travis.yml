@@ -1,0 +1,25 @@
+sudo: false
+language: android
+android:
+  components:
+  - tools
+  - platform-tools
+  - build-tools-24.0.2
+  - android-24
+  - extra-android-m2repository
+  - extra-android-support
+
+  licenses:
+  - 'android-sdk-license.*'
+
+jdk:
+  - oraclejdk8
+
+script:
+  - ./gradlew
+
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
