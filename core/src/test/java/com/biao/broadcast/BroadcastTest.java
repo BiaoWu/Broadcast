@@ -59,7 +59,7 @@ public class BroadcastTest {
     Object event = this;
 
     List<Subscriber> subscribers = new ArrayList<>();
-    subscribers.add(new Subscriber(null));
+    subscribers.add(new Subscriber(null, null));
     when(registry.getSubscribers(event)).thenReturn(subscribers);
 
     broadcast.post(event);

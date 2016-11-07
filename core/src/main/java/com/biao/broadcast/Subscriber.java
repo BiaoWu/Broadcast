@@ -15,6 +15,8 @@
  */
 package com.biao.broadcast;
 
+import java.lang.reflect.Method;
+
 /**
  * A Subscriber method on a specific object.
  *
@@ -22,8 +24,24 @@ package com.biao.broadcast;
  */
 class Subscriber {
   final Object listener;
+  final Method method;
 
-  public Subscriber(Object listener) {
+  Subscriber(Object listener, Method method) {
     this.listener = listener;
+    this.method = method;
+  }
+
+  @Override
+  public final int hashCode() {
+    return (31 + method.hashCode()) * 31 + System.identityHashCode(listener);
+  }
+
+  @Override
+  public final boolean equals(Object obj) {
+    if (obj instanceof Subscriber) {
+      Subscriber that = (Subscriber) obj;
+      return listener == that.listener && method.equals(that.method);
+    }
+    return false;
   }
 }
