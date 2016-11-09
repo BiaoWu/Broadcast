@@ -15,28 +15,17 @@
  */
 package com.biao.broadcast;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Mark a method as an event listener.
+ * {@link Subscribe} Info
  *
  * @author biaowu.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Subscribe {
+final class SubscribeInfo {
+  final boolean override;
+  final int dispatcher;
 
-  /**
-   * override that has the same identifier.
-   * see {@link DefaultRegistry.MethodIdentifier}
-   */
-  boolean override() default true;
-
-  /**
-   * dispatcher identifier
-   */
-  int dispatcher() default 0;
+  SubscribeInfo(boolean override, int dispatcher) {
+    this.override = override;
+    this.dispatcher = dispatcher;
+  }
 }

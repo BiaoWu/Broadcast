@@ -15,28 +15,16 @@
  */
 package com.biao.broadcast;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.List;
 
 /**
- * Mark a method as an event listener.
+ * dispatch events to dispatchers.
  *
  * @author biaowu.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Subscribe {
-
+public interface DispatchCenter {
   /**
-   * override that has the same identifier.
-   * see {@link DefaultRegistry.MethodIdentifier}
+   * Posts an event to all registered listeners.
    */
-  boolean override() default true;
-
-  /**
-   * dispatcher identifier
-   */
-  int dispatcher() default 0;
+  void dispatch(Object event, List<Subscriber> eventSubscribers);
 }

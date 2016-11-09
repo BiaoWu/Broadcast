@@ -25,11 +25,11 @@ import java.util.List;
 public class Broadcast {
 
   private final Registry registry;
-  private final Dispatcher dispatcher;
+  private final DispatchCenter dispatchCenter;
 
-  Broadcast(Registry registry, Dispatcher dispatcher) {
+  Broadcast(Registry registry, DispatchCenter dispatchCenter) {
     this.registry = registry;
-    this.dispatcher = dispatcher;
+    this.dispatchCenter = dispatchCenter;
   }
 
   /**
@@ -52,7 +52,7 @@ public class Broadcast {
   public void post(Object event) {
     List<Subscriber> eventSubscribers = registry.getSubscribers(event);
     if (eventSubscribers.size() > 0) {
-      dispatcher.dispatch(event, eventSubscribers);
+      dispatchCenter.dispatch(event, eventSubscribers);
     } else {
       // TODO: 2016/11/3
     }
