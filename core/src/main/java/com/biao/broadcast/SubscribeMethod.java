@@ -15,28 +15,35 @@
  */
 package com.biao.broadcast;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 
 /**
- * Mark a method as an event listener.
+ * A method wrapper.
  *
  * @author biaowu.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Subscribe {
+final class SubscribeMethod {
+  final Method method;
+  final Class<?> eventType;
+  final SubscribeInfo info;
 
-  /**
-   * override that has the same identifier.
-   * see {@link DefaultRegistry.MethodIdentifier}
-   */
-  boolean override() default true;
+  SubscribeMethod(Method method, Class<?> eventType, SubscribeInfo info) {
+    this.method = method;
+    this.eventType = eventType;
+    this.info = info;
+  }
 
-  /**
-   * dispatcher identifier
-   */
-  int dispatcher() default 0;
+  @Override
+  public final int hashCode() {
+    return method.hashCode();
+  }
+
+  @Override
+  public final boolean equals(Object obj) {
+    if (obj instanceof SubscribeMethod) {
+      SubscribeMethod that = (SubscribeMethod) obj;
+      return method == that.method;
+    }
+    return false;
+  }
 }

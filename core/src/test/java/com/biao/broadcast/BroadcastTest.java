@@ -20,13 +20,13 @@ public class BroadcastTest {
   Broadcast broadcast;
 
   @Mock Registry registry;
-  @Mock Dispatcher dispatcher;
+  @Mock DispatchCenter dispatchCenter;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    broadcast = new Broadcast(registry, dispatcher);
+    broadcast = new Broadcast(registry, dispatchCenter);
   }
 
   @Test
@@ -51,7 +51,7 @@ public class BroadcastTest {
     broadcast.post(event);
 
     verify(registry).getSubscribers(event);
-    verify(dispatcher, never()).dispatch(event, subscribers);
+    verify(dispatchCenter, never()).dispatch(event, subscribers);
   }
 
   @Test
@@ -65,6 +65,6 @@ public class BroadcastTest {
     broadcast.post(event);
 
     verify(registry).getSubscribers(event);
-    verify(dispatcher).dispatch(event, subscribers);
+    verify(dispatchCenter).dispatch(event, subscribers);
   }
 }

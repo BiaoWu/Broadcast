@@ -37,7 +37,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 final class DefaultRegistry implements Registry {
 
-  private static final Map<Class<?>, List<Method>> subscriberMethodsCache = new WeakHashMap<>();
+  private static final Map<Class<?>, List<SubscribeMethod>> subscriberMethodsCache =
+      new WeakHashMap<>();
   private static final Map<Class<?>, List<Class<?>>> eventTypeClassCache = new WeakHashMap<>();
 
   private final ConcurrentMap<Class<?>, CopyOnWriteArraySet<Subscriber>> subscribers =
@@ -99,22 +100,21 @@ final class DefaultRegistry implements Registry {
   private Map<Class<?>, Set<Subscriber>> findAllSubscribers(Object listener) {
     Map<Class<?>, Set<Subscriber>> all = new HashMap<>();
     Class<?> clazz = listener.getClass();
-    for (Method method : getAnnotatedMethods(clazz)) {
-      Class<?>[] parameterTypes = method.getParameterTypes();
-      Class<?> eventType = parameterTypes[0];
+    for (SubscribeMethod subscribeMethod : getAnnotatedMethods(clazz)) {
+      Class<?> eventType = subscribeMethod.eventType;
 
       Set<Subscriber> subscribers = all.get(eventType);
       if (subscribers == null) {
         subscribers = new HashSet<>();
         all.put(eventType, subscribers);
       }
-      subscribers.add(new Subscriber(listener, method));
+      subscribers.add(new Subscriber(listener, subscribeMethod));
     }
     return all;
   }
 
-  private List<Method> getAnnotatedMethods(Class<?> clazz) {
-    List<Method> methods = subscriberMethodsCache.get(clazz);
+  private List<SubscribeMethod> getAnnotatedMethods(Class<?> clazz) {
+    List<SubscribeMethod> methods = subscriberMethodsCache.get(clazz);
     if (methods != null) {
       return methods;
     }
@@ -126,10 +126,10 @@ final class DefaultRegistry implements Registry {
     return methods;
   }
 
-  private List<Method> getAnnotatedMethodsNotCached(final Class<?> original) {
+  private List<SubscribeMethod> getAnnotatedMethodsNotCached(final Class<?> original) {
     List<Class<?>> supertypes = getSuperTypes(original);
 
-    List<Method> subscriberMethods = new ArrayList<>();
+    List<SubscribeMethod> subscriberMethods = new ArrayList<>();
     List<MethodIdentifier> skipMethods = new ArrayList<>();
 
     for (Class<?> superType : supertypes) {
@@ -146,17 +146,20 @@ final class DefaultRegistry implements Registry {
             continue;
           }
 
-          subscriberMethods.add(method);
-
-          boolean override = subscribe.override();
-          if (override) {
+          SubscribeInfo subscribeInfo = annotationInfo(subscribe);
+          if (subscribeInfo.override) {
             skipMethods.add(identifier);
           }
+          subscriberMethods.add(new SubscribeMethod(method, parameterTypes[0], subscribeInfo));
         }
       }
     }
     return subscriberMethods.size() > 0 ? Collections.unmodifiableList(subscriberMethods)
-        : Collections.<Method>emptyList();
+        : Collections.<SubscribeMethod>emptyList();
+  }
+
+  private SubscribeInfo annotationInfo(Subscribe subscribe) {
+    return new SubscribeInfo(subscribe.override(), subscribe.dispatcher());
   }
 
   private List<Class<?>> getEventTypes(Class<?> eventType) {

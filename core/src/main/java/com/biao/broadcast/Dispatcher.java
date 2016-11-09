@@ -15,10 +15,8 @@
  */
 package com.biao.broadcast;
 
-import java.util.List;
-
 /**
- * dispatch events to subscribers.
+ * dispatch event to subscribers.
  *
  * @author biaowu.
  */
@@ -26,5 +24,10 @@ public interface Dispatcher {
   /**
    * Posts an event to all registered listeners.
    */
-  void dispatch(Object event, List<Subscriber> eventSubscribers);
+  void dispatch(DispatchAction dispatchAction);
+
+  /**
+   * @return Dispatcher id
+   */
+  int identifier();
 }

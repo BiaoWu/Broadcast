@@ -15,28 +15,26 @@
  */
 package com.biao.broadcast;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
 
 /**
- * Mark a method as an event listener.
- *
  * @author biaowu.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Subscribe {
+class DispatchAction implements Runnable {
+  final Subscriber subscriber;
+  final Object event;
 
-  /**
-   * override that has the same identifier.
-   * see {@link DefaultRegistry.MethodIdentifier}
-   */
-  boolean override() default true;
+  DispatchAction(Subscriber subscriber, Object event) {
+    this.subscriber = subscriber;
+    this.event = event;
+  }
 
-  /**
-   * dispatcher identifier
-   */
-  int dispatcher() default 0;
+  @Override
+  public void run() {
+    try {
+      subscriber.dispatchEvent(event);
+    } catch (InvocationTargetException e) {
+      // TODO: 2016/11/9
+    }
+  }
 }

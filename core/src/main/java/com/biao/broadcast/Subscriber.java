@@ -15,32 +15,40 @@
  */
 package com.biao.broadcast;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 /**
- * A Subscriber method on a specific object.
+ * A Subscriber subscribeMethod on a specific object.
  *
  * @author biaowu.
  */
 class Subscriber {
   final Object listener;
-  final Method method;
+  final SubscribeMethod subscribeMethod;
 
-  Subscriber(Object listener, Method method) {
+  Subscriber(Object listener, SubscribeMethod subscribeMethod) {
     this.listener = listener;
-    this.method = method;
+    this.subscribeMethod = subscribeMethod;
+  }
+
+  void dispatchEvent(Object event) throws InvocationTargetException {
+    try {
+      subscribeMethod.method.invoke(listener, event);
+    } catch (IllegalArgumentException | IllegalAccessException e) {
+      throw new InvocationTargetException(e);
+    }
   }
 
   @Override
   public final int hashCode() {
-    return (31 + method.hashCode()) * 31 + System.identityHashCode(listener);
+    return (31 + subscribeMethod.hashCode()) * 31 + System.identityHashCode(listener);
   }
 
   @Override
   public final boolean equals(Object obj) {
     if (obj instanceof Subscriber) {
       Subscriber that = (Subscriber) obj;
-      return listener == that.listener && method.equals(that.method);
+      return listener == that.listener && subscribeMethod.equals(that.subscribeMethod);
     }
     return false;
   }
