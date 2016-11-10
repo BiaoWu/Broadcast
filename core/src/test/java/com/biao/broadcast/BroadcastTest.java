@@ -26,7 +26,7 @@ public class BroadcastTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    broadcast = new Broadcast(registry, dispatchCenter);
+    broadcast = new Broadcast.Builder().registry(registry).dispatchCenter(dispatchCenter).build();
   }
 
   @Test
