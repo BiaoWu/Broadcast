@@ -1,5 +1,6 @@
 package com.biao.broadcast;
 
+import java.util.List;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -10,8 +11,38 @@ import static org.junit.Assert.fail;
  */
 public class BroadcastBuilderTest {
   @Test
-  public void test_set_registry() throws Exception {
-    new Broadcast.Builder().registry(new DefaultRegistry()).build();
+  public void test_all_default() throws Exception {
+    new Broadcast.Builder().build();
+  }
+
+  @Test
+  public void test_custom_dispatchCenter() throws Exception {
+    DispatchCenter dispatchCenter = new DispatchCenter() {
+      @Override
+      public void dispatch(Object event, List<Subscriber> eventSubscribers) {
+
+      }
+    };
+
+    new Broadcast.Builder().dispatchCenter(dispatchCenter).build();
+
+    try {
+      new Broadcast.Builder().dispatchCenter(dispatchCenter)
+          .dispatcher(new ImmediateDispatcher())
+          .build();
+      fail();
+    } catch (Exception e) {
+      assertTrue(e.getMessage().contains("Dispatcher"));
+    }
+
+    try {
+      new Broadcast.Builder().dispatcher(new ImmediateDispatcher())
+          .dispatchCenter(dispatchCenter)
+          .build();
+      fail();
+    } catch (Exception e) {
+      assertTrue(e.getMessage().contains("Dispatcher"));
+    }
   }
 
   @Test

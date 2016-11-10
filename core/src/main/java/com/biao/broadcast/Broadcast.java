@@ -70,8 +70,6 @@ public class Broadcast {
     private List<Dispatcher> dispatchers;
 
     public Builder() {
-      dispatchers = new ArrayList<>();
-      dispatchers.add(new ImmediateDispatcher());
     }
 
     public Builder registry(Registry registry) {
@@ -79,12 +77,24 @@ public class Broadcast {
       return this;
     }
 
-    /* package for test*/ Builder dispatchCenter(DispatchCenter dispatchCenter) {
+    public Builder dispatchCenter(DispatchCenter dispatchCenter) {
+      if (dispatchers != null) {
+        throw new IllegalArgumentException(
+            "If you custom the DispatchCenter, no need to set Dispatcher.");
+      }
+
       this.dispatchCenter = dispatchCenter;
       return this;
     }
 
     public Builder dispatcher(Dispatcher dispatcher) {
+      if (dispatchCenter != null) {
+        throw new IllegalArgumentException(
+            "If you custom the DispatchCenter, no need to set Dispatcher.");
+      }
+
+      ensureDispatchers();
+
       dispatchers.add(dispatcher);
       return this;
     }
@@ -95,6 +105,7 @@ public class Broadcast {
       }
 
       if (dispatchCenter == null) {
+        ensureDispatchers();
         checkDispatchersId();
         Dispatcher[] registeredDispatchers = new Dispatcher[dispatchers.size()];
         dispatchers.toArray(registeredDispatchers);
@@ -102,6 +113,13 @@ public class Broadcast {
       }
 
       return new Broadcast(registry, dispatchCenter);
+    }
+
+    private void ensureDispatchers() {
+      if (dispatchers == null) {
+        dispatchers = new ArrayList<>();
+        dispatchers.add(new ImmediateDispatcher());
+      }
     }
 
     private void checkDispatchersId() {
