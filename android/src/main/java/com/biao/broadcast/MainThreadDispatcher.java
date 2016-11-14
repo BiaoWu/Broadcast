@@ -23,6 +23,7 @@ import android.os.Looper;
  * @author biaowu.
  */
 public class MainThreadDispatcher extends HandlerDispatcher {
+  public static final int ID = 665201314;
 
   public MainThreadDispatcher() {
     super(Looper.getMainLooper());
@@ -30,6 +31,6 @@ public class MainThreadDispatcher extends HandlerDispatcher {
 
   @Override
   public int identifier() {
-    return 665201314;
+    return ID;
   }
 }

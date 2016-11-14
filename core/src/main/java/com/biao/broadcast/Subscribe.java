@@ -38,5 +38,5 @@ public @interface Subscribe {
   /**
    * dispatcher identifier
    */
-  int dispatcher() default 0;
+  int dispatcher() default ImmediateDispatcher.ID;
 }
