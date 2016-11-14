@@ -23,7 +23,7 @@ package com.biao.broadcast;
  * @author biaowu.
  */
 public final class ImmediateDispatcher implements Dispatcher {
-  public static final int ID = 0;
+  public static final int ID_IMMEDIATE = 0;
 
   @Override
   public void dispatch(DispatchAction dispatchAction) {
@@ -32,6 +32,6 @@ public final class ImmediateDispatcher implements Dispatcher {
 
   @Override
   public int identifier() {
-    return ID;
+    return ID_IMMEDIATE;
   }
 }

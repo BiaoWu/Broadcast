@@ -20,6 +20,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static com.biao.broadcast.ImmediateDispatcher.ID_IMMEDIATE;
+
 /**
  * Mark a method as an event listener.
  *
@@ -38,5 +40,5 @@ public @interface Subscribe {
   /**
    * dispatcher identifier
    */
-  int dispatcher() default ImmediateDispatcher.ID;
+  int dispatcher() default ID_IMMEDIATE;
 }
