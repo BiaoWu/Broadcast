@@ -18,12 +18,15 @@ package com.biao.broadcast;
 import java.lang.reflect.InvocationTargetException;
 
 /**
+ * Action here.
+ *
  * @author biaowu.
  */
-class DispatchAction implements Runnable {
+public final class DispatchAction implements Runnable {
   final Subscriber subscriber;
   final Object event;
 
+  /* package for framework */
   DispatchAction(Subscriber subscriber, Object event) {
     this.subscriber = subscriber;
     this.event = event;

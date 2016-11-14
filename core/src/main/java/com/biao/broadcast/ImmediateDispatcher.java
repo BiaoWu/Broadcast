@@ -18,9 +18,12 @@ package com.biao.broadcast;
 /**
  * Default dispatcher.
  *
+ * already added. see {@link Broadcast.Builder#ensureDispatchers()}
+ *
  * @author biaowu.
  */
-class ImmediateDispatcher implements Dispatcher {
+public final class ImmediateDispatcher implements Dispatcher {
+  public static final int ID_IMMEDIATE = 0;
 
   @Override
   public void dispatch(DispatchAction dispatchAction) {
@@ -29,6 +32,6 @@ class ImmediateDispatcher implements Dispatcher {
 
   @Override
   public int identifier() {
-    return 0;
+    return ID_IMMEDIATE;
   }
 }
