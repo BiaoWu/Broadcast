@@ -13,7 +13,7 @@ import static org.junit.Assert.fail;
 /**
  * @author biaowu.
  */
-public class DefaultDispatchCenterTest {
+public class DispatchCenterTest {
 
   private final IntegerSubscriber i1 = new IntegerSubscriber("i1");
   private final IntegerSubscriber i2 = new IntegerSubscriber("i2");
@@ -23,14 +23,12 @@ public class DefaultDispatchCenterTest {
   private final ConcurrentLinkedQueue<Object> dispatchedSubscribers = new ConcurrentLinkedQueue<>();
 
   private ImmediateDispatcher immediateDispatcher = new ImmediateDispatcher();
-  private DefaultDispatchCenter dispatcherCenterDefault;
+  private DispatchCenter dispatchCenter;
 
   @Before
   public void setUp() throws Exception {
-    Dispatcher[] dispatchers = {
-        immediateDispatcher,
-    };
-    dispatcherCenterDefault = new DefaultDispatchCenter(dispatchers);
+    Broadcast broadcast = new Broadcast.Builder().build();
+    dispatchCenter = broadcast.dispatchCenter;
 
     String methodName = "handleInteger";
     Class<?> eventType = Integer.class;
@@ -57,7 +55,7 @@ public class DefaultDispatchCenterTest {
         createSubscriber(listener, "listen", String.class, no_register_dispatcher_id));
 
     try {
-      dispatcherCenterDefault.dispatch(event, eventSubscribers);
+      dispatchCenter.dispatch(event, eventSubscribers);
       fail();
     } catch (Exception e) {
       assertTrue(e.getMessage().contains("dispatcher"));
@@ -66,7 +64,7 @@ public class DefaultDispatchCenterTest {
 
   @Test
   public void testDispatch() throws Exception {
-    dispatcherCenterDefault.dispatch(110, integerSubscribers);
+    dispatchCenter.dispatch(110, integerSubscribers);
 
     assertEquals(3, dispatchedSubscribers.size());
     assertEquals(i1, dispatchedSubscribers.poll());

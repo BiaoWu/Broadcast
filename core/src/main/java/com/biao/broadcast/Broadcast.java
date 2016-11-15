@@ -26,13 +26,12 @@ import java.util.List;
  * @author biaowu.
  */
 public class Broadcast {
+  /* package for test*/ final SubscriberRegistry registry;
+  /* package for test*/ final DispatchCenter dispatchCenter;
 
-  private final Registry registry;
-  private final DispatchCenter dispatchCenter;
-
-  private Broadcast(Registry registry, DispatchCenter dispatchCenter) {
-    this.registry = registry;
-    this.dispatchCenter = dispatchCenter;
+  private Broadcast(Dispatcher[] dispatchers) {
+    this.registry = new SubscriberRegistry(this);
+    this.dispatchCenter = new DispatchCenter(this, dispatchers);
   }
 
   /**
@@ -65,66 +64,27 @@ public class Broadcast {
    * {@link Broadcast} Builder.
    */
   public static class Builder {
-    private Registry registry;
-    private DispatchCenter dispatchCenter;
-    private List<Dispatcher> dispatchers;
+    private List<Dispatcher> dispatcherList;
 
     public Builder() {
-    }
-
-    public Builder registry(Registry registry) {
-      this.registry = registry;
-      return this;
-    }
-
-    public Builder dispatchCenter(DispatchCenter dispatchCenter) {
-      if (dispatchers != null) {
-        throw new IllegalArgumentException(
-            "If you custom the DispatchCenter, no need to set Dispatcher.");
-      }
-
-      this.dispatchCenter = dispatchCenter;
-      return this;
+      dispatcherList = new ArrayList<>();
+      dispatcherList.add(new ImmediateDispatcher());
     }
 
     public Builder dispatcher(Dispatcher dispatcher) {
-      if (dispatchCenter != null) {
-        throw new IllegalArgumentException(
-            "If you custom the DispatchCenter, no need to set Dispatcher.");
-      }
-
-      ensureDispatchers();
-
-      dispatchers.add(dispatcher);
+      dispatcherList.add(dispatcher);
       return this;
     }
 
     public Broadcast build() {
-      if (registry == null) {
-        registry = new DefaultRegistry();
-      }
+      checkDispatchers();
 
-      if (dispatchCenter == null) {
-        ensureDispatchers();
-        checkDispatchersId();
-        Dispatcher[] registeredDispatchers = new Dispatcher[dispatchers.size()];
-        dispatchers.toArray(registeredDispatchers);
-        dispatchCenter = new DefaultDispatchCenter(registeredDispatchers);
-      }
-
-      return new Broadcast(registry, dispatchCenter);
+      return new Broadcast(dispatcherList.toArray(new Dispatcher[dispatcherList.size()]));
     }
 
-    private void ensureDispatchers() {
-      if (dispatchers == null) {
-        dispatchers = new ArrayList<>();
-        dispatchers.add(new ImmediateDispatcher());
-      }
-    }
-
-    private void checkDispatchersId() {
+    private void checkDispatchers() {
       List<Integer> ids = new ArrayList<>();
-      for (Dispatcher dispatcher : dispatchers) {
+      for (Dispatcher dispatcher : dispatcherList) {
         int id = dispatcher.identifier();
         if (ids.contains(id)) {
           throw new IllegalArgumentException("Dispatcher must use unique identifier."

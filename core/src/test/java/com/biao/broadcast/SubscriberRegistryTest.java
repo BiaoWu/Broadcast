@@ -11,13 +11,14 @@ import static org.junit.Assert.fail;
 /**
  * @author biaowu.
  */
-public class DefaultRegistryTest {
+public class SubscriberRegistryTest {
 
-  private DefaultRegistry registry;
+  private SubscriberRegistry registry;
 
   @Before
   public void setUp() throws Exception {
-    registry = new DefaultRegistry();
+    Broadcast broadcast = new Broadcast.Builder().build();
+    registry = broadcast.registry;
   }
 
   @Test

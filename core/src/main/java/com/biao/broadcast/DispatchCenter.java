@@ -18,13 +18,39 @@ package com.biao.broadcast;
 import java.util.List;
 
 /**
- * dispatch events to dispatchers.
+ * Default dispatch center.
  *
  * @author biaowu.
  */
-public interface DispatchCenter {
+final class DispatchCenter {
+  final Broadcast broadcast;
+  final Dispatcher[] dispatchers;
+
+  DispatchCenter(Broadcast broadcast, Dispatcher[] dispatchers) {
+    this.broadcast = broadcast;
+    this.dispatchers = dispatchers;
+  }
+
   /**
    * Posts an event to all registered listeners.
    */
-  void dispatch(Object event, List<Subscriber> eventSubscribers);
+  void dispatch(Object event, List<Subscriber> eventSubscribers) {
+    for (Subscriber subscriber : eventSubscribers) {
+      Dispatcher dispatcher = findDispatcher(subscriber.subscribeMethod.info.dispatcher);
+      if (dispatcher != null) {
+        dispatcher.dispatch(new DispatchAction(subscriber, event));
+      } else {
+        throw new RuntimeException("dispatcher not found!");
+      }
+    }
+  }
+
+  private Dispatcher findDispatcher(int id) {
+    for (Dispatcher dispatcher : dispatchers) {
+      if (dispatcher.identifier() == id) {
+        return dispatcher;
+      }
+    }
+    return null;
+  }
 }

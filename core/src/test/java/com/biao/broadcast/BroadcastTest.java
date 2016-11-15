@@ -1,70 +1,47 @@
 package com.biao.broadcast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import org.junit.Before;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author biaowu.
  */
 public class BroadcastTest {
+  private Broadcast broadcast = new Broadcast.Builder().build();
 
-  Broadcast broadcast;
+  private final ConcurrentLinkedQueue<String> dispatchedSubscribers = new ConcurrentLinkedQueue<>();
 
-  @Mock Registry registry;
-  @Mock DispatchCenter dispatchCenter;
-
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
-    broadcast = new Broadcast.Builder().registry(registry).dispatchCenter(dispatchCenter).build();
+  @Test
+  public void test_post_event() {
+    ImmediateListener listener = new ImmediateListener();
+    broadcast.register(listener);
+    broadcast.post("Hello");
+    broadcast.post("Bill");
+    assertEquals(2, dispatchedSubscribers.size());
+    assertEquals("Hello", dispatchedSubscribers.poll());
+    assertEquals("Bill", dispatchedSubscribers.poll());
   }
 
   @Test
-  public void testRegister() throws Exception {
-    broadcast.register(this);
-    verify(registry).register(this);
+  public void test_post_a_dead_event() {
+    ImmediateListener listener = new ImmediateListener();
+    broadcast.register(listener);
+    broadcast.post("Hello");
+    assertEquals(1, dispatchedSubscribers.size());
+    assertEquals("Hello", dispatchedSubscribers.poll());
+
+    broadcast.unregister(listener);
+    broadcast.post("Bill");
+    assertEquals(0, dispatchedSubscribers.size());
+    // TODO: 2016/11/15 exception handler
   }
 
-  @Test
-  public void testUnregister() throws Exception {
-    broadcast.unregister(this);
-    verify(registry).unregister(this);
-  }
-
-  @Test
-  public void testPostADeadEvent() throws Exception {
-    Object event = this;
-
-    List<Subscriber> subscribers = Collections.emptyList();
-    when(registry.getSubscribers(event)).thenReturn(subscribers);
-
-    broadcast.post(event);
-
-    verify(registry).getSubscribers(event);
-    verify(dispatchCenter, never()).dispatch(event, subscribers);
-  }
-
-  @Test
-  public void testPost() throws Exception {
-    Object event = this;
-
-    List<Subscriber> subscribers = new ArrayList<>();
-    subscribers.add(new Subscriber(null, null));
-    when(registry.getSubscribers(event)).thenReturn(subscribers);
-
-    broadcast.post(event);
-
-    verify(registry).getSubscribers(event);
-    verify(dispatchCenter).dispatch(event, subscribers);
+  private class ImmediateListener {
+    @Subscribe
+    void listen(String message) {
+      dispatchedSubscribers.add(message);
+    }
   }
 }
