@@ -33,7 +33,7 @@ public @interface Subscribe {
 
   /**
    * override that has the same identifier.
-   * see {@link DefaultRegistry.MethodIdentifier}
+   * see {@link SubscriberRegistry.MethodIdentifier}
    */
   boolean override() default true;
 

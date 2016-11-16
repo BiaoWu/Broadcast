@@ -31,11 +31,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * Default Registry of subscribers.
+ * {@link Subscriber} Registry.
  *
  * @author biaowu.
  */
-final class DefaultRegistry implements Registry {
+final class SubscriberRegistry {
+  final Broadcast broadcast;
 
   private static final Map<Class<?>, List<SubscribeMethod>> subscriberMethodsCache =
       new WeakHashMap<>();
@@ -44,8 +45,14 @@ final class DefaultRegistry implements Registry {
   private final ConcurrentMap<Class<?>, CopyOnWriteArraySet<Subscriber>> subscribers =
       new ConcurrentHashMap<>();
 
-  @Override
-  public void register(Object listener) {
+  SubscriberRegistry(Broadcast broadcast) {
+    this.broadcast = broadcast;
+  }
+
+  /**
+   * Registers all methods that annotated by {@link Subscribe} to receive events.
+   */
+  void register(Object listener) {
     Map<Class<?>, Set<Subscriber>> allSubscribers = findAllSubscribers(listener);
 
     for (Map.Entry<Class<?>, Set<Subscriber>> entry : allSubscribers.entrySet()) {
@@ -60,8 +67,10 @@ final class DefaultRegistry implements Registry {
     }
   }
 
-  @Override
-  public void unregister(Object listener) {
+  /**
+   * Unregisters all methods that annotated by {@link Subscribe}.
+   */
+  void unregister(Object listener) {
     Map<Class<?>, Set<Subscriber>> allSubscribers = findAllSubscribers(listener);
     for (Map.Entry<Class<?>, Set<Subscriber>> entry : allSubscribers.entrySet()) {
       Class<?> eventType = entry.getKey();
@@ -74,8 +83,10 @@ final class DefaultRegistry implements Registry {
     }
   }
 
-  @Override
-  public List<Subscriber> getSubscribers(Object event) {
+  /**
+   * Get all subscribers which listen the given event.
+   */
+  List<Subscriber> getSubscribers(Object event) {
     List<Class<?>> eventTypes = getEventTypes(event.getClass());
     CopyOnWriteArrayList<Subscriber> subscribers = null;
     for (Class<?> eventType : eventTypes) {
